@@ -5,7 +5,7 @@ procedure Main is
    Input : String := "bgvyzdsv";
 begin
    for I in 0 .. Integer'Last loop
-      if Digest (Input & Ada.Strings.Fixed.Trim (Integer'Image (I), Ada.Strings.Left)) (1 .. 5) = "00000" then
+      if Digest (Input & Ada.Strings.Fixed.Trim (Integer'Image (I), Ada.Strings.Left)) (1 .. 6) = "000000" then
          Put_Line (I'Img);
          exit;
       end if;
