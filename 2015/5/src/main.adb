@@ -36,6 +36,30 @@ procedure Main is
       return Has_At_Least_3_Vowels and Has_Repeated_Chars;
    end Is_String_Nice_V1;
 
+   function Is_String_Nice_V2 (S : String) return Boolean is
+      Complies_With_Rule_One : Boolean := False;
+      Complies_With_Rule_Two : Boolean := False;
+      Pair_Of_Letters: String(1..2);
+   begin
+      for I in S'Range loop
+         if I + 2 <= S'Length and then S(I) = S(I+2) then
+            Complies_With_Rule_One := True;
+         end if;
+
+         if I + 2 < S'Length then
+            Pair_Of_Letters := S(I..I+1);
+            if Index (S(I+2..S'Length), Pair_Of_Letters) > 0 then
+               Complies_With_Rule_Two := True;
+            end if;
+
+         end if;
+
+
+      end loop;
+
+      return Complies_With_Rule_One and Complies_With_Rule_Two;
+   end Is_String_Nice_V2;
+
    function Is_String_Naughty_V1 (S : String) return Boolean is
       Ab : String := "ab";
       Bc : String := "cd";
@@ -54,9 +78,12 @@ procedure Main is
       return False;
    end Is_String_Naughty_V1;
 
-   Input_File : File_Type;
-   Is_Nice    : Integer := 0;
-   Is_Naughty : Integer := 0;
+   Input_File    : File_Type;
+   Is_Nice_V1    : Integer := 0;
+   Is_Naughty_V1 : Integer := 0;
+
+   Is_Nice_V2    : Integer := 0;
+   Is_Naughty_V2 : Integer := 0;
 
    Something_Weird : exception;
 begin
@@ -66,21 +93,27 @@ begin
       declare
          Line : String := Get_Line (Input_File);
       begin
-         if not Is_String_Naughty_V1 (Line) and then Is_String_Nice_V1 (Line) then
-            Is_Nice := Is_Nice + 1;
+-- part 1 of 2015/5
+--         if not Is_String_Naughty_V1 (Line) and then Is_String_Nice_V1 (Line) then
+--           Is_Nice_V1 := Is_Nice_V1 + 1;
+--         end if;
+--         if Is_String_Naughty_V1 (Line) or else not Is_String_Nice_V1 (Line) then
+--            Is_Naughty_V1 := Is_Naughty_V1 + 1;
+--         end if;
+--part 2 of 2015/5
+         if Is_String_Nice_V2 (Line) then
+            Is_Nice_V2 := Is_Nice_V2 + 1;
          end if;
-         if Is_String_Naughty_V1 (Line) or else not Is_String_Nice_V1 (Line) then
-            Is_Naughty := Is_Naughty + 1;
+         if not Is_String_Nice_V2 (Line) then
+            Is_Naughty_V2 := Is_Naughty_V2 + 1;
          end if;
-
       end;
-
    end loop;
 exception
    when End_Error =>
       if Is_Open (Input_File) then
-         Put_Line ("Nice: " & Is_Nice'Img);
-         Put_Line ("Naughty: " & Is_Naughty'Img);
+         Put_Line ("Nice: " & Is_Nice_V2'Img);
+         Put_Line ("Naughty: " & Is_Naughty_V2'Img);
          Close (Input_File);
       end if;
 
