@@ -39,21 +39,20 @@ procedure Main is
    function Is_String_Nice_V2 (S : String) return Boolean is
       Complies_With_Rule_One : Boolean := False;
       Complies_With_Rule_Two : Boolean := False;
-      Pair_Of_Letters: String(1..2);
+      Pair_Of_Letters        : String (1 .. 2);
    begin
       for I in S'Range loop
-         if I + 2 <= S'Length and then S(I) = S(I+2) then
+         if I + 2 <= S'Length and then S (I) = S (I + 2) then
             Complies_With_Rule_One := True;
          end if;
 
          if I + 2 < S'Length then
-            Pair_Of_Letters := S(I..I+1);
-            if Index (S(I+2..S'Length), Pair_Of_Letters) > 0 then
+            Pair_Of_Letters := S (I .. I + 1);
+            if Index (S (I + 2 .. S'Last), Pair_Of_Letters) > 0 then
                Complies_With_Rule_Two := True;
             end if;
 
          end if;
-
 
       end loop;
 
