@@ -4,6 +4,7 @@ procedure Main is
 
    type Light is record
       Is_Turned_On : Boolean := False;
+      Brightness: Integer := 0;
    end record;
 
    Light_Grid : array (0 .. 999, 0 .. 999) of Light;
@@ -15,6 +16,7 @@ procedure Main is
    Command_Toggle   : constant String := "toggle";
 
    Number_On : Integer := 0;
+   Total_Brightness: Integer := 0;
 
    function Starts_With (S : String; Needle : String) return Boolean is
      (S'Length >= Needle'Length and then S (S'First .. S'First + Needle'Length - 1) = Needle);
@@ -24,6 +26,7 @@ procedure Main is
       for I in X1 .. X2 loop
          for J in Y1 .. Y2 loop
             Light_Grid (I, J).Is_Turned_On := True;
+            Light_Grid(I,J).Brightness := Light_Grid(I,J).Brightness + 1;
          end loop;
       end loop;
    end Turn_On;
@@ -33,6 +36,11 @@ procedure Main is
       for I in X1 .. X2 loop
          for J in Y1 .. Y2 loop
             Light_Grid (I, J).Is_Turned_On := False;
+            Light_Grid(I,J).Brightness := Light_Grid(I,J).Brightness - 1;
+            if Light_Grid(I,J).Brightness < 0 then
+               Light_Grid(I,J).Brightness := 0;
+            end if;
+
          end loop;
       end loop;
    end Turn_Off;
@@ -42,6 +50,7 @@ procedure Main is
       for I in X1 .. X2 loop
          for J in Y1 .. Y2 loop
             Light_Grid (I, J).Is_Turned_On := not Light_Grid (I, J).Is_Turned_On;
+            Light_Grid(I,J).Brightness := Light_Grid(I,J).Brightness + 2;
          end loop;
       end loop;
    end Toggle;
@@ -123,9 +132,11 @@ exception
                if Light_Grid (I, J).Is_Turned_On then
                   Number_On := Number_On + 1;
                end if;
+               Total_Brightness := Total_Brightness + Light_Grid (I, J).Brightness;
             end loop;
          end loop;
          Put_Line (Number_On'Img);
+         Put_Line (Total_Brightness'Img);
          Close (Input_File);
       end if;
 end Main;
