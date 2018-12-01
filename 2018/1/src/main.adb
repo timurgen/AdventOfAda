@@ -46,7 +46,7 @@ procedure Main is
 
    procedure Register_Already_Seen_But_Only_First_Time (I : Integer) is
    begin
-      if Already_Seen_Number /= 0 then
+      if Already_Seen_Number = 0 then
          Already_Seen_Number := I;
       end if;
 
