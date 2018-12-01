@@ -8,5 +8,8 @@ project Calibratingit is
       for Switches ("ada") use ("-M120");
    end Pretty_Printer;
 
+   package Linker is
+   end Linker;
+
 end Calibratingit;
 
