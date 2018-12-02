@@ -1,4 +1,5 @@
 with Ada.Text_IO;
+with Ada.Containers.Indefinite_Vectors;
 
 procedure Main is
    use Ada;
@@ -8,6 +9,26 @@ procedure Main is
    Input_File    : Text_IO.File_Type;
    Two_Letters   : Natural := 0;
    Three_Letters : Natural := 0;
+
+   -- part 2
+   package String_List is new Ada.Containers.Indefinite_Vectors
+     (Index_Type   => Positive,
+      Element_Type => String);
+   Input_Strings : String_List.Vector;
+
+   function Is_Exactly_One_Char_Diff (A, B : String) return Boolean is
+      Levenstein_Distance : Natural := 0;
+   begin
+      for I in A'Range loop
+         if A (I) /= B (I) then
+            Levenstein_Distance := Levenstein_Distance + 1;
+         end if;
+
+         exit when Levenstein_Distance > 1;
+      end loop;
+      return Levenstein_Distance = 1;
+   end Is_Exactly_One_Char_Diff;
+
 begin
    Text_IO.Open
      (File => Input_File,
@@ -36,9 +57,33 @@ begin
                exit;
             end if;
          end loop;
-
+         -- part 2 populate list
+         Input_Strings.Append (Line);
       end;
    end loop;
+   Text_IO.Close (Input_File);
+   --part 2
+   for I in Input_Strings.First_Index .. Input_Strings.Last_Index loop
+      for J in Input_Strings.First_Index + I .. Input_Strings.Last_Index loop
+         declare
+            A : String := Input_Strings (I);
+            B : String := Input_Strings (J);
+         begin
+            if Is_Exactly_One_Char_Diff (A => A, B => B) then
+               for K in A'Range loop
+                  if A(K) = B(K) then
+                     Text_IO.Put(A(K));
+                  end if;
+
+               end loop;
+               Text_IO.New_Line;
+            end if;
+
+         end;
+      end loop;
+   end loop;
+
+   -- output
    Text_IO.Put_Line
      (Natural'Image (Two_Letters) &
         " " &
