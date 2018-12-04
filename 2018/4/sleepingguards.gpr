@@ -9,11 +9,11 @@ project Sleepingguards is
    end Pretty_Printer;
 
    package Compiler is
-      for Switches ("ada") use ("-gnatn", "-funroll-loops", "-pg", "-g");
+      for Switches ("ada") use ("-gnatn", "-funroll-loops", "-g", "-ffunction-sections", "-gnat12");
    end Compiler;
 
    package Linker is
-      for Switches ("ada") use ("-pg", "-g");
+      for Switches ("ada") use ("-g");
    end Linker;
 
 end Sleepingguards;

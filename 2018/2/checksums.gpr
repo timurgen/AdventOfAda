@@ -8,5 +8,13 @@ project Checksums is
       for Switches ("ada") use ("-M120");
    end Pretty_Printer;
 
+   package Compiler is
+      for Switches ("ada") use ("-O2", "-gnatn", "-funroll-loops", "-gnato", "-fstack-check", "-ffunction-sections", "-gnat12", "-g");
+   end Compiler;
+
+   package Linker is
+      for Switches ("ada") use ("-g", "--coverage");
+   end Linker;
+
 end Checksums;
 
