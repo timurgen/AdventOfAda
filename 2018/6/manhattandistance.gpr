@@ -8,5 +8,13 @@ project Manhattandistance is
       for Default_Switches ("ada") use ("-M120");
    end Pretty_Printer;
 
+   package Compiler is
+      for Switches ("ada") use ("-g");
+   end Compiler;
+
+   package Linker is
+      for Switches ("ada") use ("-g");
+   end Linker;
+
 end Manhattandistance;
 
