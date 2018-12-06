@@ -63,19 +63,19 @@ begin
          Max_Col_Number := Point_List (I).Y;
       end if;
    end loop;
-
    declare
-      Grid                 : Grid_T (0 .. Max_Row_Number + 1, 0 .. Max_Col_Number + 1) := (others => (others => null));
+      Grid         : Grid_T (0 .. Max_Row_Number + 1, 0 .. Max_Col_Number + 1)   := (others => (others => null));
+      Result_Array : array (1 .. Max_Row_Number, 1 .. Max_Col_Number) of Natural := (others => (others => 0));
+
       Last_Known_Distance  : Natural;
-      Current_Min_Distance : Natural                                                     := Natural'Last;
-      Result_Array         : array (1 .. Max_Row_Number, 1 .. Max_Col_Number) of Natural := (others => (others => 0));
-      Result_Num           : Natural                                                     := 0;
+      Current_Min_Distance : Natural := Natural'Last;
+      Result_Num           : Natural := 0;
+      Part2_Region_Size    : Natural := 0;
    begin
       for Y in Grid'Range (1) loop
          for X in Grid'Range loop
             Current_Min_Distance := Natural'Last;
             for Z in Point_List.First_Index .. Point_List.Last_Index loop
-
                Last_Known_Distance := Manhattan_Distance (Point_List (Z), (X, Y, False));
                if Last_Known_Distance < Current_Min_Distance then
                   if X = Grid'First or else X = Grid'Last or else Y = Grid'First (1) or else Y = Grid'Last (1) then
@@ -109,13 +109,35 @@ begin
          --New_Line;
       end loop;
       for I in Result_Array'Range loop
-         for J in Result_Array'Range(1) loop
-            if Result_Array(I,J) > Result_Num then
-               Result_Num := Result_Array(I,J);
+         for J in Result_Array'Range (1) loop
+            if Result_Array (I, J) > Result_Num then
+               Result_Num := Result_Array (I, J);
             end if;
          end loop;
       end loop;
-      Put_Line(Result_Num'Img);
+      Put_Line ("Part 1" & Result_Num'Img);
+
+      --part 2
+      for Y in Grid'Range (1) loop
+         for X in Grid'Range loop
+            declare
+               Total_Distance : Natural := 0;
+            begin
+               for Z in Point_List.First_Index .. Point_List.Last_Index loop
+                  Total_Distance := Total_Distance + Manhattan_Distance (Point_List (Z), (X, Y, False));
+               end loop;
+               if Total_Distance < 10000 then
+                  --Put("#");
+                  Part2_Region_Size := Part2_Region_Size + 1;
+               else
+                  --Put("X");
+                  null;
+               end if;
+            end;
+         end loop;
+         --New_Line;
+      end loop;
+      Put_Line ("Part 2" & Part2_Region_Size'Img);
    end;
 
 end Main;

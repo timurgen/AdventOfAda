@@ -9,7 +9,7 @@ project Manhattandistance is
    end Pretty_Printer;
 
    package Compiler is
-      for Switches ("ada") use ("-g");
+      for Switches ("ada") use ("-g", "-O2", "-gnatn");
    end Compiler;
 
    package Linker is
