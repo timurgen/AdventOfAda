@@ -9,11 +9,11 @@ project Metadata is
    end Pretty_Printer;
 
    package Compiler is
-      for Switches ("ada") use ("-g");
+      for Switches ("ada") use ("-O2", "-gnatn", "-gnatp");
    end Compiler;
 
    package Linker is
-      for Switches ("ada") use ("-g");
+      for Switches ("ada") use ("-s");
    end Linker;
 
 end Metadata;
