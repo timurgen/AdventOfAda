@@ -3,22 +3,30 @@ with Ada.Containers.Indefinite_Vectors; use Ada.Containers;
 with Ada.Unchecked_Deallocation;
 
 procedure Main is
+   type Int_Array is array (Positive range <>) of Natural;
+   type Node_Header;
+   type Node_Header_Ptr is access all Node_Header;
+
+   package Values_V_P is new Indefinite_Vectors (Positive, Natural);
+   package Children_V_P is new Indefinite_Vectors (Positive, Node_Header_Ptr);
 
    type Node_Header is record
-      Children : Natural;
-      Metadata : Natural;
+      Children      : Natural;
+      Metadata      : Natural;
+      Values        : Values_V_P.Vector;
+      Children_List : Children_V_P.Vector;
    end record;
 
    type Stack_Node;
    type Stack is access Stack_Node;
    type Stack_Node is record
-      Element : Node_Header;
+      Element : Node_Header_Ptr;
       Next    : Stack := null;
    end record;
 
    Stack_Empty_Error : exception;
 
-   procedure Push (Item : Node_Header; Onto : in out Stack) is
+   procedure Push (Item : Node_Header_Ptr; Onto : in out Stack) is
       Temp : Stack := new Stack_Node;
    begin
       Temp.Element := Item;
@@ -26,7 +34,7 @@ procedure Main is
       Onto         := Temp;
    end Push;
 
-   procedure Pop (Item : out Node_Header; From : in out Stack) is
+   procedure Pop (Item : out Node_Header_Ptr; From : in out Stack) is
       procedure Free is new Ada.Unchecked_Deallocation (Stack_Node, Stack);
       Temp : Stack := From;
    begin
@@ -44,11 +52,7 @@ procedure Main is
       return (null);
    end Create;
 
-   type Int_Array is array (Positive range <>) of Natural;
-
-   function Split_String
-     (S         : String;
-      Delimeter : Character) return Int_Array
+   function Split_String (S : String; Delimeter : Character) return Int_Array
    is
       Result_Size : Natural := 0;
    begin
@@ -74,41 +78,77 @@ procedure Main is
       end;
    end Split_String;
 
+   function Recursive_Part_2 (Node : Node_Header_Ptr) return Natural is
+      Sum : Natural := 0;
+   begin
+      if Node.Children_List.Length = 0 then
+         for I in Node.Values.First_Index .. Node.Values.Last_Index loop
+            Sum := Sum + Node.Values (I);
+         end loop;
+         return Sum;
+      else
+         for I in Node.Values.First_Index .. Node.Values.Last_Index loop
+            declare
+               Value              : Natural := Node.Values (I);
+               Current_Child_Node : Node_Header_Ptr;
+            begin
+               if Value in
+                 Node.Children_List.First_Index ..
+                   Node.Children_List.Last_Index
+               then
+                  Current_Child_Node := Node.Children_List.Element (Value);
+                  Sum := Sum + Recursive_Part_2 (Current_Child_Node);
+               end if;
+            end;
+         end loop;
+         return Sum;
+      end if;
+   end Recursive_Part_2;
+
    Input_File : File_Type;
 begin
-   Open (Input_File, In_File, "test.txt");
+   Open (Input_File, In_File, "input.txt");
    declare
-      Line        : String    := Get_Line (Input_File);
-      Data        : Int_Array := Split_String (Line, ' ');
-      Stack_Obj   : Stack     := Create;
-      Current_Header : Node_Header;
-      Data_Idx: Natural := Data'First;
-      Sum_Metadata : Natural := 0;
+      Line           : String    := Get_Line (Input_File);
+      Data           : Int_Array := Split_String (Line, ' ');
+      Stack_Obj      : Stack     := Create;
+      Data_Idx       : Natural   := Data'First;
+      Sum_Metadata   : Natural   := 0;
+      Current_Header : Node_Header_Ptr;
    begin
-      Current_Header := (Data (Data_Idx), Data (Data_Idx+1));
+      Current_Header          := new Node_Header;
+      Current_Header.Children := Data (Data_Idx);
+      Current_Header.Metadata := Data (Data_Idx + 1);
+
       Data_Idx := Data_Idx + 2;
       Push (Current_Header, Stack_Obj);
 
       while not Is_Empty (Stack_Obj) loop
-         Pop(Current_Header, Stack_Obj);
+         Pop (Current_Header, Stack_Obj);
          if Current_Header.Children > 0 then
             Current_Header.Children := Current_Header.Children - 1;
-            Push(Current_Header, Stack_Obj);
             declare
-               Next_Child: Node_Header := (Data(Data_Idx),Data(Data_Idx +1));
+               Next_Child : Node_Header_Ptr;
             begin
-               Push(Next_Child, Stack_Obj);
+               Next_Child          := new Node_Header;
+               Next_Child.Children := Data (Data_Idx);
+               Next_Child.Metadata := Data (Data_Idx + 1);
+               Current_Header.Children_List.Append (Next_Child);
+               Push (Current_Header, Stack_Obj);
+               Push (Next_Child, Stack_Obj);
                Data_Idx := Data_Idx + 2;
             end;
          else
-            for I in 1..Current_Header.Metadata loop
+            for I in 1 .. Current_Header.Metadata loop
                --Put(Data(Data_Idx)'Img);
-               Sum_Metadata := Sum_Metadata + Data(Data_Idx);
-               Data_Idx := Data_Idx +1;
+               Current_Header.Values.Append (Data (Data_Idx));
+               Sum_Metadata := Sum_Metadata + Data (Data_Idx);
+               Data_Idx     := Data_Idx + 1;
             end loop;
          end if;
       end loop;
-      Put_Line("Sum of metadata" & Natural'Image(Sum_Metadata));
+      Put_Line ("Part 1:" & Natural'Image (Sum_Metadata));
+      Put_Line ("Part 2:" & Recursive_Part_2 (Current_Header)'Img);
    end;
    Close (Input_File);
 end Main;
