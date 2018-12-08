@@ -81,30 +81,34 @@ begin
       Line        : String    := Get_Line (Input_File);
       Data        : Int_Array := Split_String (Line, ' ');
       Stack_Obj   : Stack     := Create;
-      Last_Header : Node_Header;
-      Idx: Natural := 2;
+      Current_Header : Node_Header;
+      Data_Idx: Natural := Data'First;
+      Sum_Metadata : Natural := 0;
    begin
-      Last_Header := (Data (Data'First), Data (Data'First + 1));
-      Push (Last_Header, Stack_Obj);
+      Current_Header := (Data (Data_Idx), Data (Data_Idx+1));
+      Data_Idx := Data_Idx + 2;
+      Push (Current_Header, Stack_Obj);
+
       while not Is_Empty (Stack_Obj) loop
-         if Last_Header.Children > 0 then
-            Pop(Last_Header,Stack_Obj);
-            Last_Header.Children := Last_Header.Children -1;
-            Push(Last_Header, Stack_Obj);
-            Push((Data(Idx+1), Data(Idx+2)), Stack_Obj);
-            Idx := Idx+2;
-         elsif Last_Header.Metadata > 0 then
-            Pop(Last_Header, Stack_Obj);
-            Last_Header.Metadata := Last_Header.Metadata - 1;
-            Put(Data(Idx)'Img);
-            Push(Last_Header, Stack_Obj);
-            Idx := Idx + 1;
+         Pop(Current_Header, Stack_Obj);
+         if Current_Header.Children > 0 then
+            Current_Header.Children := Current_Header.Children - 1;
+            Push(Current_Header, Stack_Obj);
+            declare
+               Next_Child: Node_Header := (Data(Data_Idx),Data(Data_Idx +1));
+            begin
+               Push(Next_Child, Stack_Obj);
+               Data_Idx := Data_Idx + 2;
+            end;
          else
-            Pop(Last_Header, Stack_Obj);
+            for I in 1..Current_Header.Metadata loop
+               --Put(Data(Data_Idx)'Img);
+               Sum_Metadata := Sum_Metadata + Data(Data_Idx);
+               Data_Idx := Data_Idx +1;
+            end loop;
          end if;
-
       end loop;
-
+      Put_Line("Sum of metadata" & Natural'Image(Sum_Metadata));
    end;
    Close (Input_File);
 end Main;
