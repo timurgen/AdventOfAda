@@ -11,14 +11,14 @@ procedure Main is
    package String_Vectors is new Indefinite_Vectors (Positive, String);
    use String_Vectors;
 
-   function Is_Equal_Strings (Left, Right : Unbounded_String) return Boolean is
+   function "=" (Left, Right : Unbounded_String) return Boolean is
    begin
       return To_String (Left) = To_String (Right);
-   end Is_Equal_Strings;
+   end "=";
 
    package Bag_Content_Map is new Hashed_Maps
      (Key_Type => Unbounded_String, Element_Type => Integer,
-      Hash => Ada.Strings.Unbounded.Hash, Equivalent_Keys => Is_Equal_Strings);
+      Hash => Ada.Strings.Unbounded.Hash, Equivalent_Keys => "=");
 
    type Bag_Rule is record
       Bag_Name    : Unbounded_String;
